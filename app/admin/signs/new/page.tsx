@@ -42,6 +42,7 @@ export default function NewSignPage() {
       if (data) setTags(data)
     }
     fetchTags()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleAddImage = () => {
@@ -347,7 +348,7 @@ export default function NewSignPage() {
                   />
                   <label htmlFor="is-popular" className="flex-1 cursor-pointer">
                     <span className="font-medium">🔥 Popular Sign</span>
-                    <p className="text-xs text-gray-500">Show in "Popular Signs" section on homepage</p>
+                    <p className="text-xs text-gray-500">Show in &quot;Popular Signs&quot; section on homepage</p>
                   </label>
                 </div>
 
@@ -361,7 +362,7 @@ export default function NewSignPage() {
                   />
                   <label htmlFor="is-seasonal" className="flex-1 cursor-pointer">
                     <span className="font-medium">🌟 Seasonal Sign</span>
-                    <p className="text-xs text-gray-500">Show in "Seasonal Collection" section</p>
+                    <p className="text-xs text-gray-500">Show in &quot;Seasonal Collection&quot; section</p>
                   </label>
                 </div>
 
