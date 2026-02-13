@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { createClient } from '@/lib/supabase/client'
 import { Mail, CheckCircle } from 'lucide-react'
 
 export default function ContactPage() {
@@ -16,30 +15,38 @@ export default function ContactPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
-  const supabase = createClient()
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    const { error: submitError } = await supabase
-      .from('contact_submissions')
-      .insert({
-        name,
-        email,
-        message,
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+        }),
       })
 
-    if (submitError) {
-      setError(submitError.message)
-      setLoading(false)
-    } else {
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message')
+      }
+
       setSuccess(true)
       setLoading(false)
       setName('')
       setEmail('')
       setMessage('')
+    } catch (err: any) {
+      setError(err.message)
+      setLoading(false)
     }
   }
 
@@ -136,8 +143,8 @@ export default function ContactPage() {
         <div className="mt-12 text-center text-gray-600">
           <p className="mb-2">
             Prefer email? Reach us at{' '}
-            <a href="mailto:support@protestsigns.com" className="text-black hover:underline">
-              support@protestsigns.com
+            <a href="mailto:your-email@gmail.com" className="text-black hover:underline">
+              your-email@gmail.com
             </a>
           </p>
         </div>

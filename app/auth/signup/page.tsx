@@ -1,12 +1,40 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+
+// Password strength checker
+function checkPasswordStrength(password: string) {
+  let strength = 0
+  const checks = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+  }
+
+  if (checks.length) strength++
+  if (checks.uppercase) strength++
+  if (checks.lowercase) strength++
+  if (checks.number) strength++
+  if (checks.special) strength++
+
+  return { strength, checks }
+}
+
+function getStrengthLabel(strength: number) {
+  if (strength === 0) return { label: '', color: '' }
+  if (strength <= 2) return { label: 'Weak', color: 'text-red-600 bg-red-100' }
+  if (strength <= 3) return { label: 'Fair', color: 'text-yellow-600 bg-yellow-100' }
+  if (strength <= 4) return { label: 'Good', color: 'text-blue-600 bg-blue-100' }
+  return { label: 'Strong', color: 'text-green-600 bg-green-100' }
+}
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -16,12 +44,57 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [emailExists, setEmailExists] = useState(false)
+  const [checkingEmail, setCheckingEmail] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState({ strength: 0, checks: { length: false, uppercase: false, lowercase: false, number: false, special: false } })
 
   const supabase = createClient()
+
+  // Check password strength on change
+  useEffect(() => {
+    if (password) {
+      setPasswordStrength(checkPasswordStrength(password))
+    } else {
+      setPasswordStrength({ strength: 0, checks: { length: false, uppercase: false, lowercase: false, number: false, special: false } })
+    }
+  }, [password])
+
+  // Check if email exists (debounced)
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (email && email.includes('@')) {
+        setCheckingEmail(true)
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('email', email)
+          .single()
+        
+        setEmailExists(!!data && !error)
+        setCheckingEmail(false)
+      } else {
+        setEmailExists(false)
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [email, supabase])
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    // Validation
+    if (emailExists) {
+      setError('An account with this email already exists. Please sign in instead.')
+      return
+    }
+
+    if (passwordStrength.strength < 3) {
+      setError('Please choose a stronger password. Use at least 8 characters with uppercase, lowercase, and numbers.')
+      return
+    }
+
     setLoading(true)
 
     const { error } = await supabase.auth.signUp({
@@ -35,7 +108,11 @@ export default function SignUpPage() {
     })
 
     if (error) {
-      setError(error.message)
+      if (error.message.includes('already registered')) {
+        setError('An account with this email already exists. Please sign in instead.')
+      } else {
+        setError(error.message)
+      }
       setLoading(false)
     } else {
       setSuccess(true)
@@ -115,7 +192,16 @@ export default function SignUpPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="you@example.com"
+                className={emailExists ? 'border-red-500' : ''}
               />
+              {checkingEmail && (
+                <p className="text-xs text-gray-500 mt-1">Checking availability...</p>
+              )}
+              {emailExists && (
+                <p className="text-xs text-red-600 mt-1">
+                  ⚠️ This email is already registered. <Link href="/auth/login" className="underline font-medium">Sign in instead</Link>
+                </p>
+              )}
             </div>
 
             <div>
@@ -129,14 +215,48 @@ export default function SignUpPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                minLength={6}
+                minLength={8}
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Minimum 6 characters
-              </p>
+              
+              {password && (
+                <>
+                  <div className="mt-2">
+                    <div className={`text-xs font-medium px-2 py-1 rounded inline-block ${getStrengthLabel(passwordStrength.strength).color}`}>
+                      {getStrengthLabel(passwordStrength.strength).label}
+                    </div>
+                  </div>
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-center text-xs">
+                      <span className={passwordStrength.checks.length ? 'text-green-600' : 'text-gray-400'}>
+                        {passwordStrength.checks.length ? '✓' : '○'} At least 8 characters
+                      </span>
+                    </div>
+                    <div className="flex items-center text-xs">
+                      <span className={passwordStrength.checks.uppercase ? 'text-green-600' : 'text-gray-400'}>
+                        {passwordStrength.checks.uppercase ? '✓' : '○'} One uppercase letter
+                      </span>
+                    </div>
+                    <div className="flex items-center text-xs">
+                      <span className={passwordStrength.checks.lowercase ? 'text-green-600' : 'text-gray-400'}>
+                        {passwordStrength.checks.lowercase ? '✓' : '○'} One lowercase letter
+                      </span>
+                    </div>
+                    <div className="flex items-center text-xs">
+                      <span className={passwordStrength.checks.number ? 'text-green-600' : 'text-gray-400'}>
+                        {passwordStrength.checks.number ? '✓' : '○'} One number
+                      </span>
+                    </div>
+                    <div className="flex items-center text-xs">
+                      <span className={passwordStrength.checks.special ? 'text-green-600' : 'text-gray-400'}>
+                        {passwordStrength.checks.special ? '✓' : '○'} One special character
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading || emailExists || passwordStrength.strength < 3}>
               {loading ? 'Creating account...' : 'Sign Up'}
             </Button>
           </form>

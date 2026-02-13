@@ -39,10 +39,157 @@
 
 ---
 
+## 🌐 API Endpoints & Functionality
+
+### Public Pages
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `/` | GET | Homepage with tag-based groups | ✅ Works |
+| `/browse` | GET | Browse all signs with filters | ✅ Works |
+| `/browse?tag=popular` | GET | Pre-filtered by tag | ✅ Works |
+| `/sign/[id]` | GET | Individual sign details | ✅ Works |
+| `/cart` | GET | Shopping cart | ✅ Works (requires auth) |
+| `/contact` | GET | Contact support form | ✅ Works |
+| `/checkout/success` | GET | Order confirmation | ✅ Works |
+
+### Authentication Pages
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `/auth/login` | GET | Login page | ✅ Works |
+| `/auth/signup` | GET | Sign up page with password strength checker | ✅ Works |
+| `/auth/forgot-password` | GET | Request password reset link | ✅ Works |
+| `/auth/update-password` | GET | Reset password with new strong password | ✅ Works |
+| `/auth/callback` | GET | OAuth callback | ✅ Works (needs OAuth setup) |
+
+### Admin Pages (Protected)
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `/admin` | GET | Admin dashboard | ✅ Works (requires is_admin=true) |
+| `/admin/signs` | GET | Manage signs | ✅ Works |
+| `/admin/signs/new` | GET | Create new sign | ✅ Works |
+| `/admin/signs/[id]/edit` | GET | Edit sign | 📝 Not yet implemented |
+| `/admin/tags` | GET | Manage tags | ✅ Works |
+| `/admin/tags/new` | GET | Create new tag | ✅ Works |
+| `/admin/orders` | GET | View orders | ✅ Works |
+
+### API Routes
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `/api/stripe/checkout` | POST | Create Stripe checkout session | ✅ Works |
+| `/api/stripe/webhook` | POST | Handle Stripe webhooks | ⚠️ Needs webhook secret |
+| `/api/contact` | POST | Submit contact form | ✅ Works (needs Resend key) |
+
+### Supabase Tables (Backend)
+| Table | Description | Status |
+|-------|-------------|--------|
+| `profiles` | User profiles with admin flag | ⏳ Need to create |
+| `tags` | Categories/filters | ⏳ Need to create |
+| `signs` | Product listings | ⏳ Need to create |
+| `sign_tags` | Sign-tag relationships | ⏳ Need to create |
+| `cart_items` | Shopping cart items | ⏳ Need to create |
+| `orders` | Completed purchases | ⏳ Need to create |
+| `order_items` | Items in orders | ⏳ Need to create |
+| `contact_submissions` | Contact form messages | ⏳ Need to create |
+
+### Authentication Features
+| Feature | Provider | Status |
+|---------|----------|--------|
+| Email/Password | Supabase | ✅ Works (after tables created) |
+| Google OAuth | Google | ⚠️ Needs setup in Supabase dashboard |
+| Yahoo OAuth | Yahoo | ⚠️ Needs setup in Supabase dashboard |
+| Password Reset | Supabase | ✅ Works (after tables created) |
+
+### Payment Features
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Browse signs | ✅ Works | After tables created |
+| Add to cart | ✅ Works | After tables created |
+| Buy Now checkout | ✅ Works | Redirects to Stripe |
+| Cart checkout | ✅ Works | Redirects to Stripe |
+| Payment processing | ✅ Works | Handled by Stripe |
+| Inventory update | ⚠️ Partial | Needs webhook secret |
+| Cart clearing | ⚠️ Partial | Needs webhook secret |
+
+---
+
+## 🎯 What Works RIGHT NOW (Before Tables)
+
+### ✅ Will Work:
+- Homepage loads (but shows "No signs available")
+- Browse page loads (empty)
+- Contact form (if Resend key added)
+- Auth pages display
+
+### ❌ Won't Work Yet:
+- Sign up/login (no profiles table)
+- Viewing signs (no signs table)
+- Shopping cart (no cart_items table)
+- Admin functions (no tables)
+
+### After Running `supabase/schema.sql`:
+- ✅ All auth works
+- ✅ Browse/view signs works
+- ✅ Cart works
+- ✅ Admin works
+- ⚠️ Checkout works but inventory won't update (needs webhook)
+
+---
+
+## 📋 Setup Checklist
+
+### Completed ✅
+- [x] Supabase URL
+- [x] Supabase anon key
+- [x] Supabase service role key
+- [x] Stripe test keys
+- [x] Resend API key
+- [x] Contact email
+
+### Todo ⏳
+- [ ] Run database schema (`supabase/schema.sql`)
+- [ ] Create sign images storage bucket
+- [ ] Create first admin user
+- [ ] Add Stripe webhook secret (after deployment)
+- [ ] (Optional) Setup Google OAuth
+- [ ] (Optional) Setup Yahoo OAuth
+
+---
+
+## 🚀 Next Steps
+
+1. **Create Database Tables** (5 minutes)
+   - Go to Supabase dashboard
+   - SQL Editor → New query
+   - Copy `supabase/schema.sql` → Run
+   
+2. **Create Storage Bucket** (2 minutes)
+   - Storage → New bucket
+   - Name: `sign-images`
+   - Public: ✓ Yes
+   
+3. **Run the app:**
+   ```bash
+   make dev
+   ```
+
+4. **Create admin account:**
+   - Sign up at `/auth/signup`
+   - Go to Supabase → profiles table
+   - Set `is_admin = true` for your user
+
+---
+
 ## ✨ Features
 
 ### User Features
-- **Authentication**: Email/password signup, Google OAuth, Yahoo OAuth, forgot password
+- **Authentication**: 
+  - Email/password signup with **password strength checker** (8+ chars, uppercase, lowercase, numbers, special chars)
+  - **Real-time email existence check** (prevents duplicate accounts)
+  - Google OAuth (see `GOOGLE_OAUTH_SETUP.md` for 10-min setup)
+  - Yahoo OAuth (optional)
+  - Forgot password flow with secure reset page
+  - **Session persistence** via secure httpOnly cookies (7-day expiration)
+  - **Logout button** in navbar
 - **Browse Signs**: Filter by tags/categories (OR logic), search, sort by price/date
 - **Sign Details**: View images, sizes, pricing, stock availability
 - **Shopping Cart**: Add multiple items, adjust quantities, persistent cart
@@ -50,7 +197,7 @@
   - **Buy Now**: Direct Stripe checkout for a single item
   - **Cart Checkout**: Stripe checkout with multiple items
 - **Inventory Management**: Automatic stock updates after successful purchases
-- **Contact Support**: Submit inquiries via contact form
+- **Contact Support**: Submit inquiries via contact form with email notifications (Resend)
 
 ### Admin Features
 - **Sign Management**: Create, edit, delete (soft delete), and archive signs
@@ -443,4 +590,4 @@ MIT
 
 ## 📧 Support
 
-For questions or issues, use the Contact page on the site or reach out to the development team. 
+For questions or issues, use the Contact page on the site or reach out to the development team.

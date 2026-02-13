@@ -8,7 +8,7 @@ help: ## Show this help message
 install: ## Install dependencies
 	npm install
 
-dev: ## Run development server
+dev: ## Run development server (with Turbopack for faster compilation)
 	npm run dev
 
 build: ## Build for production

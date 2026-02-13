@@ -6,6 +6,7 @@ import { formatPrice } from '@/lib/utils'
 import { ArrowRight } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 60 // Revalidate every 60 seconds
 
 interface SignWithTags {
   id: string
