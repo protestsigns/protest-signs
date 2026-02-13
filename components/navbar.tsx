@@ -34,10 +34,6 @@ export function Navbar() {
               setIsAdmin(data?.is_admin || false)
             }
           })
-          .catch((err) => {
-            console.error('Profile query failed:', err)
-            setIsAdmin(false)
-          })
 
         // Get cart count (with error handling)
         supabase
@@ -52,10 +48,6 @@ export function Navbar() {
               const total = data?.reduce((sum, item) => sum + item.quantity, 0) || 0
               setCartCount(total)
             }
-          })
-          .catch((err) => {
-            console.error('Cart query failed:', err)
-            setCartCount(0)
           })
       }
     })
