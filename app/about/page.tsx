@@ -35,7 +35,7 @@ export default function AboutPage() {
 
           <div>
             <p>
-              After nine years on the board of a non-profit promoting sustainability, and serving two terms as an elected official on a board of supervisors helping spend close to half a billion dollars of taxpayers' money, our founder came to realize that creating win-win relationships works better than picking winners and losers — or being continually underfunded while trying to promote the common good.
+              After nine years on the board of a non-profit promoting sustainability, and serving two terms as an elected official on a board of supervisors helping spend close to half a billion dollars of taxpayers&apos; money, our founder came to realize that creating win-win relationships works better than picking winners and losers — or being continually underfunded while trying to promote the common good.
             </p>
           </div>
 
