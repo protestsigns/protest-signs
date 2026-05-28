@@ -5,13 +5,15 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, Loader2 } from 'lucide-react'
+import { clearGuestCart } from '@/lib/guest-cart'
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate a brief loading state
+    clearGuestCart()
+    window.dispatchEvent(new Event('guest-cart-update'))
     setTimeout(() => setLoading(false), 1000)
   }, [])
 

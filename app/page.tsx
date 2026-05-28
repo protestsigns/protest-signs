@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/button'
@@ -8,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { formatPrice } from '@/lib/utils'
 import { getBagTiers, type PricingTier } from '@/lib/pricing'
 import { ArrowRight, Star, Shield, Truck, Megaphone } from 'lucide-react'
+import { SignCard } from '@/components/sign-card'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 60
@@ -309,67 +309,14 @@ export default async function HomePage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {popularSigns.map((sign, index) => (
-                <Link
+                <SignCard
                   key={sign.id}
-                  href={`/sign/${sign.id}`}
-                  className="group cursor-pointer"
-                >
-                  <Card className="overflow-hidden border shadow-sm hover:shadow-xl transition-all duration-300 h-full">
-                    {/* Show both sides side by side if 2+ images */}
-                    {sign.images.length >= 2 ? (
-                      <div className="flex overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
-                        <div className="relative flex-1 aspect-[3/4]">
-                          <Image
-                            src={sign.images[0]}
-                            alt={`${sign.title} — Side A`}
-                            fill
-                            priority={index < 4}
-                            sizes="(max-width: 640px) calc(50vw - 1rem), (max-width: 1024px) calc(25vw - 1rem), (max-width: 1280px) calc(16vw - 1rem), 12vw"
-                            className="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <div className="relative flex-1 aspect-[3/4] border-l border-gray-200">
-                          <Image
-                            src={sign.images[1]}
-                            alt={`${sign.title} — Side B`}
-                            fill
-                            priority={index < 4}
-                            sizes="(max-width: 640px) calc(50vw - 1rem), (max-width: 1024px) calc(25vw - 1rem), (max-width: 1280px) calc(16vw - 1rem), 12vw"
-                            className="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="aspect-[3/4] bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-                        {sign.images.length > 0 ? (
-                          <Image
-                            src={sign.images[0]}
-                            alt={sign.title}
-                            fill
-                            priority={index < 4}
-                            sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(50vw - 2rem), (max-width: 1280px) calc(33vw - 2rem), 25vw"
-                            className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <Megaphone className="w-16 h-16" />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    {sign.quantity_available <= 5 && (
-                      <div className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-lg">
-                        {sign.quantity_available} left
-                      </div>
-                    )}
-                    <CardContent className="p-4">
-                      <h4 className="font-bold text-sm mb-1 group-hover:text-gray-700 transition-colors line-clamp-2">
-                        {sign.title}
-                      </h4>
-                      <p className="text-xs text-gray-500">Front &amp; back shown</p>
-                    </CardContent>
-                  </Card>
-                </Link>
+                  sign={sign}
+                  index={index}
+                  priceLabel={null}
+                  dualSizes="(max-width: 640px) calc(50vw - 1rem), (max-width: 1024px) calc(25vw - 1rem), (max-width: 1280px) calc(16vw - 1rem), 12vw"
+                  singleSizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(50vw - 2rem), (max-width: 1280px) calc(33vw - 2rem), 25vw"
+                />
               ))}
             </div>
           </div>
@@ -399,40 +346,14 @@ export default async function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {seasonalSigns.slice(0, 4).map((sign) => (
-                <Link
+              {seasonalSigns.slice(0, 4).map((sign, index) => (
+                <SignCard
                   key={sign.id}
-                  href={`/sign/${sign.id}`}
-                  className="group cursor-pointer"
-                >
-                  <Card className="overflow-hidden border shadow-sm hover:shadow-xl transition-all duration-300 h-full">
-                    <div className="aspect-[3/4] bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-                      {sign.images.length > 0 ? (
-                        <Image
-                          src={sign.images[0]}
-                          alt={sign.title}
-                          fill
-                          className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                          <Megaphone className="w-16 h-16" />
-                        </div>
-                      )}
-                      {sign.quantity_available <= 5 && (
-                        <div className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-lg">
-                          {sign.quantity_available} left
-                        </div>
-                      )}
-                    </div>
-                    <CardContent className="p-5">
-                      <h4 className="font-bold text-base mb-3 group-hover:text-gray-700 transition-colors line-clamp-2 min-h-[3rem]">
-                        {sign.title}
-                      </h4>
-                      <p className="text-2xl font-bold text-black">{formatPrice(sign.price)}</p>
-                    </CardContent>
-                  </Card>
-                </Link>
+                  sign={sign}
+                  index={index}
+                  priceLabel={formatPrice(sign.price)}
+                  singleSizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(50vw - 4rem), calc(25vw - 2rem)"
+                />
               ))}
             </div>
           </div>
@@ -483,40 +404,14 @@ export default async function HomePage() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {group.signs.slice(0, 4).map((sign) => (
-                      <Link
+                    {group.signs.slice(0, 4).map((sign, index) => (
+                      <SignCard
                         key={sign.id}
-                        href={`/sign/${sign.id}`}
-                        className="group cursor-pointer"
-                      >
-                        <Card className="overflow-hidden border shadow-sm hover:shadow-xl transition-all duration-300 h-full">
-                          <div className="aspect-[3/4] bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-                            {sign.images.length > 0 ? (
-                              <Image
-                                src={sign.images[0]}
-                                alt={sign.title}
-                                fill
-                                className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                <Megaphone className="w-16 h-16" />
-                              </div>
-                            )}
-                            {sign.quantity_available <= 5 && (
-                              <div className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-lg">
-                                {sign.quantity_available} left
-                              </div>
-                            )}
-                          </div>
-                          <CardContent className="p-5">
-                            <h4 className="font-bold text-base mb-3 group-hover:text-gray-700 transition-colors line-clamp-2 min-h-[3rem]">
-                              {sign.title}
-                            </h4>
-                            <p className="text-2xl font-bold text-black">{formatPrice(sign.price)}</p>
-                          </CardContent>
-                        </Card>
-                      </Link>
+                        sign={{ ...sign, product_type: null }}
+                        index={index}
+                        priceLabel={formatPrice(sign.price)}
+                        singleSizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(50vw - 4rem), calc(25vw - 2rem)"
+                      />
                     ))}
                   </div>
                 </div>

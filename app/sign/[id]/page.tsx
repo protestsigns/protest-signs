@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/utils'
 import { ShoppingCart, Loader2, Truck, AlertCircle, Package } from 'lucide-react'
 import { computeBagPrice, getBagTiers, getPaperShipping, type PricingTier } from '@/lib/pricing'
+import { addToGuestCart } from '@/lib/guest-cart'
 
 interface Sign {
   id: string
@@ -69,7 +70,11 @@ export default function SignDetailPage() {
   const previewBagPrice = computeBagPrice(quantity, tiers)
 
   const handleAddToCart = async () => {
-    if (!user) { router.push('/auth/login'); return }
+    if (!user) {
+      addToGuestCart(sign!.id, quantity)
+      router.push('/cart')
+      return
+    }
     setAddingToCart(true)
 
     const { data: existingItem } = await supabase
@@ -93,7 +98,6 @@ export default function SignDetailPage() {
   }
 
   const handleBuyNow = async () => {
-    if (!user) { router.push('/auth/login'); return }
     setBuyingNow(true)
 
     const response = await fetch('/api/stripe/checkout', {
