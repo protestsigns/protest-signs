@@ -6,7 +6,8 @@ import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ShoppingCart, User, LogOut } from 'lucide-react'
+import { ShoppingCart, LogOut } from 'lucide-react'
+import { getGuestCartCount } from '@/lib/guest-cart'
 
 export function Navbar() {
   const pathname = usePathname()
@@ -49,8 +50,14 @@ export function Navbar() {
               setCartCount(total)
             }
           })
+      } else {
+        // Guest: read from localStorage
+        setCartCount(getGuestCartCount())
       }
     })
+
+    const refreshGuestCount = () => setCartCount(getGuestCartCount())
+    window.addEventListener('guest-cart-update', refreshGuestCount)
 
     // Subscribe to cart changes
     const channel = supabase
@@ -79,6 +86,7 @@ export function Navbar() {
 
     return () => {
       supabase.removeChannel(channel)
+      window.removeEventListener('guest-cart-update', refreshGuestCount)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
@@ -152,22 +160,20 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
+            <Link href="/cart" className="relative">
+              <Button variant="ghost" size="sm">
+                <ShoppingCart className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
             {user ? (
-              <>
-                <Link href="/cart" className="relative">
-                  <Button variant="ghost" size="sm">
-                    <ShoppingCart className="w-5 h-5" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                        {cartCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
-                <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                  <LogOut className="w-5 h-5" />
-                </Button>
-              </>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="w-5 h-5" />
+              </Button>
             ) : (
               <>
                 <Link href="/auth/login">
@@ -176,7 +182,7 @@ export function Navbar() {
                   </Button>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button size="sm">Sign Up</Button>
+                  <Button size="sm" className="hidden sm:inline-flex">Sign Up</Button>
                 </Link>
               </>
             )}

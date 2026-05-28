@@ -37,17 +37,18 @@ export async function POST(request: Request) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as any
 
-    const userId = session.metadata.user_id
+    const userId = session.metadata.user_id ?? null
     const items = JSON.parse(session.metadata.items)
 
-    // Create order
+    // Create order (user_id is null for guest checkouts)
     const { data: order } = await supabase
       .from('orders')
       .insert({
-        user_id: userId,
+        ...(userId ? { user_id: userId } : {}),
         stripe_session_id: session.id,
         status: 'completed',
         total: session.amount_total,
+        customer_email: session.customer_details?.email ?? null,
       })
       .select()
       .single()
@@ -80,15 +81,17 @@ export async function POST(request: Request) {
         }
       }
 
-      // Clear user's cart
-      await supabase
-        .from('cart_items')
-        .delete()
-        .eq('user_id', userId)
-        .in(
-          'sign_id',
-          items.map((i: any) => i.sign_id)
-        )
+      // Clear logged-in user's cart (guest carts are cleared client-side on success page)
+      if (userId) {
+        await supabase
+          .from('cart_items')
+          .delete()
+          .eq('user_id', userId)
+          .in(
+            'sign_id',
+            items.map((i: any) => i.sign_id)
+          )
+      }
     }
   }
 

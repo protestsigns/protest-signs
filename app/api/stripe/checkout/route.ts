@@ -13,7 +13,6 @@ export async function POST(request: Request) {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { items } = await request.json()
     if (!items || items.length === 0) return NextResponse.json({ error: 'No items provided' }, { status: 400 })
@@ -122,8 +121,9 @@ export async function POST(request: Request) {
       line_items: lineItems,
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cart`,
+      ...(user ? {} : { customer_creation: 'always' as const }),
       metadata: {
-        user_id: user.id,
+        ...(user ? { user_id: user.id } : { guest: 'true' }),
         items: JSON.stringify(items),
       },
     })
