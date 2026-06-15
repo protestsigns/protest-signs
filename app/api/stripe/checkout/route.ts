@@ -124,7 +124,7 @@ export async function POST(request: Request) {
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      automatic_payment_methods: { enabled: true },
+      payment_method_types: ['card'],
       line_items: lineItems,
       shipping_address_collection: { allowed_countries: ['US'] },
       phone_number_collection: { enabled: true },
