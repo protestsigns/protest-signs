@@ -35,7 +35,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
   if (!order) notFound()
 
   const stripeUrl = order.stripe_session_id
-    ? `https://dashboard.stripe.com/${
+    ? `https://dashboard.stripe.com/${process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID}/${
         order.stripe_session_id.startsWith('cs_test_') ? 'test/' : ''
       }checkout/sessions/${order.stripe_session_id}`
     : null
