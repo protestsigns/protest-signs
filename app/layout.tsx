@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/navbar";
+import { ScrollToTop } from "@/components/scroll-to-top";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -72,6 +74,8 @@ export default function RootLayout({
       <body className="antialiased">
         <Navbar />
         <main className="min-h-screen">{children}</main>
+        <ScrollToTop />
+        <Analytics />
         <footer className="border-t bg-gray-50 py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">

@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     // Send email notification
     try {
       await resend.emails.send({
-        from: 'Protest Signs <onboarding@resend.dev>', // Default Resend address
+        from: `Protest Signs <${process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev'}>`,
         to: process.env.CONTACT_EMAIL || 'sustainamericallc@gmail.com',
         replyTo: email,
         subject: `New Contact Form: ${name}`,
