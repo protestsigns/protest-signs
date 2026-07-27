@@ -165,62 +165,44 @@ export default async function HomePage() {
     <div className="min-h-screen bg-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* 1 — Hero */}
-      <section className="relative bg-black text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-gray-900 to-black opacity-90" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <div className="text-center">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              MAKE YOUR
-              <span className="block bg-gradient-to-r from-white via-gray-200 to-white bg-clip-text text-transparent">
-                VOICE HEARD
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-10 text-gray-300 max-w-3xl mx-auto">
-              High-quality, professionally printed protest signs for every cause.
-              Stand up, speak out, make an impact.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/browse">
-                <Button size="lg" className="bg-white text-black hover:bg-gray-100 border-white text-lg px-8 py-6">
-                  Browse All Signs
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Link href="#categories">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8 py-6">
-                  View Categories
-                </Button>
-              </Link>
+      {/* 1 — Photo 1: protest bags in action */}
+      <section className="py-10 sm:py-12 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+            <Image
+              src="https://igxnbkgaehqlowydrene.supabase.co/storage/v1/object/public/marketing/homepage-photo-1.jpg"
+              alt="Protest bag signs ready to carry at a rally"
+              width={4032}
+              height={3024}
+              className="w-full h-auto"
+              sizes="(min-width: 896px) 896px, 100vw"
+              priority
+            />
+            <div className="p-5 sm:p-6 text-sm sm:text-base text-gray-700">
+              <p className="font-semibold text-black mb-1">Protest bag signs — ready to carry.</p>
+              <p>Weatherproof plastic bag signs that slide over a cardboard backing. Lightweight, reusable, and easy to make.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2 — Photo 1: protest bags in action */}
-      <section className="w-full bg-gray-900 overflow-hidden">
-        <div className="relative w-full h-64 sm:h-80 md:h-[420px] lg:h-[520px]">
-          <Image
-            src="https://igxnbkgaehqlowydrene.supabase.co/storage/v1/object/public/marketing/homepage-photo-1.jpg"
-            alt="Protest bag signs ready to carry at a rally"
-            fill
-            className="object-cover object-center"
-            sizes="100vw"
-            priority
-          />
-        </div>
-      </section>
-
-      {/* 3 — Photo 2: bag being slid over cardboard */}
-      <section className="w-full bg-gray-100 overflow-hidden">
-        <div className="relative w-full h-64 sm:h-80 md:h-[420px] lg:h-[520px]">
-          <Image
-            src="https://igxnbkgaehqlowydrene.supabase.co/storage/v1/object/public/marketing/homepage-photo-2.jpg"
-            alt="Sliding a printed protest sign bag over a cardboard backing"
-            fill
-            className="object-cover object-center"
-            sizes="100vw"
-          />
+      {/* 2 — Photo 2: bag being slid over cardboard */}
+      <section className="pb-10 sm:pb-12 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+            <Image
+              src="https://igxnbkgaehqlowydrene.supabase.co/storage/v1/object/public/marketing/homepage-photo-2.jpg"
+              alt="Sliding a printed protest sign bag over a cardboard backing"
+              width={4032}
+              height={3024}
+              className="w-full h-auto"
+              sizes="(min-width: 896px) 896px, 100vw"
+            />
+            <div className="p-5 sm:p-6 text-sm sm:text-base text-gray-700">
+              <p className="font-semibold text-black mb-1">That easy — slide and staple.</p>
+              <p>Cut cardboard to size, attach it to a stick, slide the bag over it, and staple across the bottom. Done.</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -287,15 +269,14 @@ export default async function HomePage() {
       <section className="py-12 bg-gray-50 border-t border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-            <div className="relative w-full h-64 sm:h-80 md:h-[420px]">
-              <Image
-                src="https://igxnbkgaehqlowydrene.supabase.co/storage/v1/object/public/marketing/homepage-photo-3.jpg"
-                alt="Side-by-side comparison: sign with white paper backing versus plain cardboard showing through"
-                fill
-                className="object-contain bg-gray-50"
-                sizes="(min-width: 768px) 896px, 100vw"
-              />
-            </div>
+            <Image
+              src="https://igxnbkgaehqlowydrene.supabase.co/storage/v1/object/public/marketing/homepage-photo-3.jpg"
+              alt="Side-by-side comparison: sign with white paper backing versus plain cardboard showing through"
+              width={4032}
+              height={3024}
+              className="w-full h-auto"
+              sizes="(min-width: 768px) 896px, 100vw"
+            />
             <div className="p-5 sm:p-6 text-sm sm:text-base text-gray-700">
               <p>
                 The ink on the bags is not indestructible and can be scratched. When
@@ -440,8 +421,8 @@ export default async function HomePage() {
               <div className="inline-block bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full mb-4">
                 COMING SOON
               </div>
-              <h3 className="text-2xl font-bold mb-2">Plant Pals</h3>
-              <p className="text-gray-500 text-sm">Mini signs for your garden, porch, or anywhere you want to make your voice heard.</p>
+              <h3 className="text-2xl font-bold mb-2">Plant Pals — Mini Signs</h3>
+              <p className="text-gray-500 text-sm">Small signs made for your garden, porch, or planter. Same bold messages, mini size — put them anywhere you want to make your voice heard.</p>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-sm text-center border border-gray-100">
               <div className="inline-block bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full mb-4">
