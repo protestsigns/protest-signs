@@ -49,7 +49,7 @@ export default function AboutPage() {
           <div>
             <h2 className="text-2xl font-bold text-black mb-3">The Problem — and the Solution</h2>
             <p>
-              Fast forward to today: for a sign we&apos;d like to sell for $10, materials with printing could run $7–8 before overhead or labor — and when you add shipping on a heavy paper sign, the cost climbs to around $20. Protest signs are still a great way to lose money.
+              Fast forward to today: for a sign we&apos;d like to sell for $10, materials with printing could run $7–8 before overhead or labor — and when you add shipping on a heavy paper sign, shipping can cost twice what the sign costs so protest signs are still a great way to lose money.
             </p>
             <p className="mt-4">
               The problem is we were making signs like it was the last century. By switching to plastic bags, we&apos;ve lowered both the shipping cost and the material cost. And it doesn&apos;t get any easier to make a sign than to attach a piece of cardboard to a stick and slide a bag over it.

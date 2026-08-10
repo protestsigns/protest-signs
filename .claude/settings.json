@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(sips -g pixelWidth -g pixelHeight '/Users/tejvirmann/Documents/protest-signs/buck-7-27/Photo1-3/First Photo.jpeg' '/Users/tejvirmann/Documents/protest-signs/buck-7-27/Photo1-3/Second Photo.jpeg' '/Users/tejvirmann/Documents/protest-signs/buck-7-27/Photo1-3/Third  photo .jpeg' '/Users/tejvirmann/Documents/protest-signs/buck-7-27/t-shirts/Shirt 1 Front.jpeg' '/Users/tejvirmann/Documents/protest-signs/buck-7-27/t-shirts/Shirt 2 Front .jpeg')",
+      "Bash(sips -s format jpeg -s formatOptions 85 -Z 1400 '/Users/tejvirmann/Documents/protest-signs/buck-7-27/Photo1-3/First Photo.jpeg' --out /Users/tejvirmann/Documents/protest-signs/public/homepage-photo-1.jpg)",
+      "Bash(sips -s format jpeg -s formatOptions 85 -Z 1400 '/Users/tejvirmann/Documents/protest-signs/buck-7-27/Photo1-3/Second Photo.jpeg' --out /Users/tejvirmann/Documents/protest-signs/public/homepage-photo-2.jpg)",
+      "Bash(sips -s format jpeg -s formatOptions 85 -Z 1400 '/Users/tejvirmann/Documents/protest-signs/buck-7-27/Photo1-3/Third  photo .jpeg' --out /Users/tejvirmann/Documents/protest-signs/public/homepage-photo-3.jpg)",
+      "Bash(sips -s format jpeg -s formatOptions 85 -Z 900 '/Users/tejvirmann/Documents/protest-signs/buck-7-27/t-shirts/Shirt 1 Front.jpeg' --out /Users/tejvirmann/Documents/protest-signs/public/shirt-1-front.jpg)",
+      "Bash(sips -s format jpeg -s formatOptions 85 -Z 900 '/Users/tejvirmann/Documents/protest-signs/buck-7-27/t-shirts/Shirt 2 Front .jpeg' --out /Users/tejvirmann/Documents/protest-signs/public/shirt-2-front.jpg)",
+      "Read(//private/tmp/pages-extract/horz/**)",
+      "Bash(sips -g pixelWidth -g pixelHeight /tmp/pages-extract/horz/preview.jpg /tmp/pages-extract/horz/preview-web.jpg)",
+      "Read(//private/tmp/pages-extract/**)",
+      "Bash(unzip -o vert.zip -d vert/)",
+      "Read(//tmp/pages-extract/**)",
+      "Read(//tmp/pages-extract/horz/**)",
+      "Read(//tmp/pages-extract/vert/**)",
+      "Read(//private/tmp/pages-extract/vert/**)",
+      "Bash(curl -s https://igxnbkgaehqlowydrene.supabase.co/storage/v1/bucket -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlneG5ia2dhZWhxbG93eWRyZW5lIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDk1NTM4NCwiZXhwIjoyMDg2NTMxMzg0fQ.v01VfCjV34VZqLGz3fxrtWtFJpf89BdH4Dp90SG_2Ko')",
+      "Bash(python3 -m json.tool)"
+    ]
+  }
+}

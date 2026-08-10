@@ -145,7 +145,7 @@ export async function POST(request: Request) {
 
         try {
           await resend.emails.send({
-            from: 'Protest Signs <onboarding@resend.dev>',
+            from: `Protest Signs <${process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev'}>`,
             to: order.customer_email,
             subject: `Order Confirmation #${reference} — Protest Signs`,
             html: `
