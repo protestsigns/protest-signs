@@ -44,6 +44,7 @@ In plain terms, here's what happens when someone buys something:
 | Reset password | `/auth/update-password` | Where someone lands from that reset email to type a new password. |
 | My account | `/account` | A logged-in customer's own page — name and password. |
 
+![Sign in page](sign-screenshots/signin.png)
 ![Browse page](sign-screenshots/browse.png)
 ![Product page](sign-screenshots/product.png)
 ![Cart](sign-screenshots/cart.png)
