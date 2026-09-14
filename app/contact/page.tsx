@@ -65,6 +65,9 @@ export default function ContactPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md px-4 py-3 mb-4">
+              A confirmation email is on its way — if you don&apos;t see it in a few minutes, please check your spam or junk folder.
+            </p>
             <Button onClick={() => setSuccess(false)} className="w-full">
               Send Another Message
             </Button>

@@ -28,9 +28,12 @@ export default function CheckoutSuccessPage() {
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
         <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
         <h1 className="text-3xl font-bold mb-2">Order Successful!</h1>
-        <p className="text-gray-600 mb-8">
+        <p className="text-gray-600 mb-4">
           Thank you for your purchase. Your order has been confirmed and will be
           processed shortly.
+        </p>
+        <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md px-4 py-3 mb-8">
+          A confirmation email is on its way — if you don&apos;t see it in a few minutes, please check your spam or junk folder.
         </p>
         <div className="space-y-3">
           <Link href="/" className="block">

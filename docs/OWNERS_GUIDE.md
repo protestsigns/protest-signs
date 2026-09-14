@@ -4,6 +4,11 @@
 
 *Companion document: **Protest Signs — Credentials Reference** (shared with you as a separate Google Doc). Whenever this guide says "log in," the actual username/password location is in that doc.*
 
+> **If something comes up that needs a developer** (see Section 7), here's who to call:
+> - Name: _______________________
+> - Phone/email: _______________________
+> - Notes: _______________________
+
 ---
 
 ## 1. What This Website Is
@@ -80,28 +85,48 @@ You don't need to memorize this, but it helps to have the mental picture when so
 
 ![Architecture diagram](diagrams/architecture.png)
 
-**In words:** the website itself (code) lives on **GitHub** and runs on **Vercel**. All store data (signs, orders, accounts) lives in **Supabase**. Payments go through **Stripe**. Emails go through **Resend**. The **Admin Panel** is just a part of the website only staff can access, which reads and writes the same Supabase database.
+**In words:** the domain (protestsigns.com) is registered at **GoDaddy**, which points it at **Vercel** via DNS and also lets **Resend** prove it's allowed to send email from that domain (also via DNS). The website itself (code) lives on **GitHub** and runs on **Vercel**. All store data (signs, orders, accounts) lives in **Supabase**. Payments go through **Stripe**. Emails go through **Resend**, landing in the **Gmail inbox** for order/contact alerts, and delivered to customers for their own confirmations. Customers can also sign in via **Google Cloud**'s OAuth, handled through Supabase. The **Admin Panel** is part of the website only staff can access, which reads and writes the same Supabase database.
 
-`[SCREENSHOT: Vercel project dashboard]`
-`[SCREENSHOT: Supabase table editor showing the "orders" table]`
+![Vercel project dashboard](sign-screenshots/vercel.png)
+![Supabase project dashboard](sign-screenshots/supabase.png)
+*(Optional: a screenshot of Supabase's Table Editor → `orders` table specifically would replace the general dashboard view above with something more directly tied to order data.)*
 
 ---
 
-## 4. The Tech Stack — What Each Piece Does
+## 4. Every Component — What It Is And What It's For
+
+This table covers every system you have credentials for (see the companion Credentials Reference doc), what it actually does, and how it connects to everything else.
+
+| Component | What it is | What it's used for | Connects to |
+|---|---|---|---|
+| **GoDaddy** | The domain registrar — where `protestsigns.com` itself is registered/renewed | Controls DNS records: which server the domain points to, and which mail-sending services are allowed to send email "from" the domain | Points the domain at Vercel; provides the DNS records Resend needs to verify sending |
+| **GitHub** | Source code hosting | Stores every version of the website's code | Pushing to the main branch triggers Vercel to rebuild and redeploy the live site |
+| **Vercel** | Hosting platform | Runs the actual website; also holds the environment variables (API keys) the site uses, including which Stripe mode is active | Pulls code from GitHub; talks to Supabase, Stripe, and Resend on the site's behalf |
+| **Supabase** | Database + customer auth | Stores every sign, order, customer account, and contact-form message; handles email/password and Google login | Read/written by Vercel (the live site) and the Admin Panel; hands off to Google Cloud for Google sign-in |
+| **Stripe** | Payment processor | Charges customer cards, handles payouts to your bank, refunds, and (optionally) sales tax | Called by Vercel to create a checkout session; sends a webhook back to Vercel when a payment succeeds |
+| **Resend** | Transactional email service | Sends order confirmations and contact-form emails/replies | Called by Vercel's code; needs GoDaddy DNS records to be "verified" for protestsigns.com; delivers to customers and to the Gmail inbox |
+| **Gmail** (`protestsigns111@gmail.com`) | The email inbox | Where new-order and contact-form alerts land for you to read; also the account most other services were signed up under | Receives mail from Resend; typically the login email for Vercel/Supabase/GitHub/Resend accounts |
+| **Google Cloud** | Holds the OAuth Client (Client ID/Secret) | Powers the "Sign in/up with Google" button so customers can skip creating a password | Configured into Supabase's Auth provider settings — not called directly by the website's own code |
+| **Admin Panel** (`protestsigns.com/admin`) | The staff-only control panel, part of the website itself | Where you manage signs, pricing, tags, orders, and users day-to-day | Reads/writes the same Supabase database the live site uses |
+
+---
+
+## 5. The Tech Stack — What Each Piece Does
 
 | System | What it is | When you'd ever need to log into it |
 |---|---|---|
-| **Vercel** | Hosts the website — the "server" the site actually runs on. Every time code changes, Vercel rebuilds and publishes the new version automatically. | Rarely — mostly to check if the site is "up," or to view environment settings (like Stripe keys — see Section 8). |
+| **Vercel** | Hosts the website — the "server" the site actually runs on. Every time code changes, Vercel rebuilds and publishes the new version automatically. | Rarely — mostly to check if the site is "up," view traffic/analytics, or view environment settings (like Stripe keys — see Section 8). |
 | **GitHub** | Stores the website's source code and its history of changes. | Only if you hire a developer to make code changes — they'll push changes here, which auto-deploys to Vercel. |
 | **Supabase** | The database — every sign, order, customer account, and contact-form message lives here. Also handles customer login/accounts. | To look up an order directly, check inventory numbers, or if the admin panel doesn't show something you need. |
 | **Stripe** | Processes all credit card payments and payouts to your bank account. | To see payment history, issue refunds, check payouts, or update your bank account for deposits. |
 | **Resend** | Sends all automated emails (order confirmations, contact form replies). | Only if emails stop arriving — check the "Domains" and "Logs" tabs there first. |
-| **Admin Panel** (`protestsigns.com/admin`) | The control panel *you* actually use day-to-day — built specifically for managing this store. | This is your main tool. Everything in Section 5 happens here. |
-| **Google Sign-In** | Powers the "Sign in/up with Google" buttons on the login/signup pages, so customers can use their Google account instead of a password. Configured through a Google Cloud project + a setting inside Supabase — not something in the website's own code. | Only if that button stops working — see Common Situations below. |
+| **Admin Panel** (`protestsigns.com/admin`) | The control panel *you* actually use day-to-day — built specifically for managing this store. | This is your main tool. Everything in Section 6 happens here. |
+| **Google Sign-In** | Powers the "Sign in/up with Google" buttons on the login/signup pages, so customers can use their Google account instead of a password. **This is entirely powered by Supabase** — the website's own code just asks Supabase to "start a Google login" and Supabase handles the rest (redirecting to Google, verifying the login, sending the customer back). See below for exactly where this lives in the Supabase dashboard. | Only if that button stops working — see Common Situations below. |
+| **GoDaddy** | Where the domain is registered and its DNS records live. | Only for domain renewal, or if a developer needs to add/change a DNS record (e.g. fixing email verification). |
 
 ---
 
-## 5. Page-By-Page: What You Can Do Yourself
+## 6. Page-By-Page: What You Can Do Yourself
 
 All of this happens by logging into `protestsigns.com/admin` with your admin account — no developer needed.
 
@@ -141,19 +166,19 @@ All of this happens by logging into `protestsigns.com/admin` with your admin acc
 
 ---
 
-## 6. What Requires a Developer
+## 7. What Requires a Developer
 
 These involve editing the website's actual code, not just data in the admin panel — and it's a common misconception (worth flagging clearly) that *everything* on the homepage is admin-editable. It isn't. Only signs, pricing, tags, and orders are. Everything else on the homepage — the hero section wording, which sections appear in what order, images, the "How to Make a Sign" video — is hardcoded into the page and needs a developer to change:
 
 - Homepage layout, wording, section order, or images not tied to an admin-editable field
 - Adding new pages or new *types* of listings (e.g. a wholly new product category with different fields than signs have)
 - Changing how checkout works, adding new payment methods
-- DNS/domain changes (e.g. verifying email sending — see Section 9)
+- DNS/domain changes (e.g. verifying email sending — see Section 10)
 - Anything involving the code in GitHub
 
 ---
 
-## 7. Stripe: Test Mode vs. Live Mode
+## 8. Stripe: Test Mode vs. Live Mode
 
 Stripe has two completely separate modes. This trips a lot of people up, so it's worth understanding clearly:
 
@@ -179,7 +204,7 @@ The actual key values live in the Credentials Reference doc / Stripe Dashboard d
 
 ---
 
-## 8. Common Situations
+## 9. Common Situations
 
 **"A customer says they never got a confirmation email."**
 Check Resend's dashboard → Logs for that email address — it'll show delivered / bounced / spam. If it says delivered but the customer says they don't see it, ask them to check spam — this is common until the sending domain is fully verified (see below).
@@ -196,15 +221,100 @@ First check `protestsigns.com/api/health` — if it loads and shows all green/tr
 **"I need to know if the database is 'paused.'"**
 Supabase automatically pauses free-tier projects after a period of inactivity. Log into supabase.com, open the project — if it shows a "Restore" button instead of the normal dashboard, it's paused and needs a click to restore (may take a minute to spin back up).
 
-**"The 'Sign in with Google' button doesn't work."**
-This is configured in two places that both need to agree: a Google Cloud project (holds the actual Google credentials) and Supabase → Authentication → Providers → Google (where those credentials get entered). If the button errors out, check Supabase's Auth logs first — a common cause is the Google Cloud OAuth consent screen expiring or being suspended, which needs a developer or whoever owns the Google Cloud project to fix. Customers can always fall back to signing in with plain email/password in the meantime — this doesn't take the whole site down.
+**"How does 'Sign in with Google' actually work, and where do I see it?"**
+It's powered entirely by Supabase — the website's own code doesn't handle Google logins itself. When a customer clicks the button, the site just asks Supabase to start a Google login; Supabase redirects them to Google, verifies it, and sends them back signed in.
+
+To see this in the Supabase dashboard yourself: log into supabase.com → open the project → **Authentication** (left sidebar) → **Providers** → **Google**. That page shows whether Google sign-in is turned on and holds the Google credentials (Client ID/Secret) that make it work — but not which Google account those credentials belong to (that's set up separately in Google Cloud Console).
+
+**If the button doesn't work:** this is configured in two places that both need to agree — a Google Cloud project (holds the actual Google credentials) and that same Supabase → Authentication → Providers → Google screen (where those credentials get entered). If the button errors out, check Supabase's **Authentication → Logs** first — a common cause is the Google Cloud OAuth consent screen expiring or being suspended, which needs a developer or whoever owns the Google Cloud project to fix. Customers can always fall back to signing in with plain email/password in the meantime — this doesn't take the whole site down.
+
+**"How many people are visiting the site?"**
+The site already has Vercel Analytics installed. Log into Vercel → your project → **Analytics** tab to see visitor counts, page views, and top pages — no extra setup needed.
+
+**"The domain is about to expire / I need to renew it."**
+That happens at GoDaddy, not Vercel or anywhere else — log into GoDaddy directly to check the renewal date and payment method on file.
 
 ---
 
-## 9. Where To Go From Here
+## 10. Backing Up Your Data
+
+You don't need to run backups yourself day-to-day — Supabase keeps the database running continuously — but it's worth knowing how to pull a copy of your data out, both for your own records and in case you ever need to hand data to an accountant, a new developer, or recover something.
+
+**Exporting orders/signs/customers as a spreadsheet (CSV):**
+1. Log into supabase.com and open the project
+2. Go to the **Table Editor** (left sidebar)
+3. Pick a table — usually `orders`, `order_items`, `signs`, or `contact_submissions`
+4. Use the **Export** button (usually in the top-right of the table view) to download it as a CSV, which opens in Excel/Google Sheets
+
+**A simpler option for orders specifically:** the Admin Panel's **Orders → Download USPS CSV** button already exports order/shipping data without needing to touch Supabase directly.
+
+**How often should this happen?** There's no automated backup schedule you need to manage — Supabase handles that on its end for the database itself. Manual exports above are only for when *you* want a copy in hand (e.g., before a big change, for year-end taxes, or before switching developers).
+
+---
+
+## 11. Where To Go From Here
 
 - Day-to-day store management: **Admin Panel**
 - Payment questions: **Stripe Dashboard**
 - Email delivery questions: **Resend Dashboard**
+- Traffic/visitor questions: **Vercel → Analytics**
+- Domain/renewal questions: **GoDaddy**
+- Need a copy of your data: **Supabase Table Editor / Admin → Orders → Download USPS CSV** (Section 10)
 - Anything involving code, layout, or new features: **a developer**
 - All login locations: **Credentials Reference** (companion Google Doc)
+
+---
+
+## 12. For a Future Developer
+
+If you (Buck) ever hire a new developer, or if you're a developer picking this project up, this section is for you.
+
+### Tech stack
+- **Framework:** Next.js 14 (App Router), React 18, TypeScript
+- **Styling:** Tailwind CSS
+- **Database/Auth:** Supabase (Postgres + Supabase Auth, including Google OAuth)
+- **Payments:** Stripe (Checkout Sessions + webhooks)
+- **Email:** Resend
+- **Hosting:** Vercel, auto-deploying from the `main` branch on GitHub
+- **Analytics:** Vercel Analytics (`@vercel/analytics`), already wired into `app/layout.tsx`
+
+### Where things live in the code
+- `app/` — every page and route, using Next's App Router (folder = URL path). Customer-facing pages sit at the top level (`app/page.tsx`, `app/browse`, `app/cart`, etc.); staff-only pages live under `app/admin/`.
+- `app/api/` — server-side API routes: `contact` (contact form + emails), `stripe/checkout` (creates a Checkout Session), `stripe/webhook` (handles `checkout.session.completed`, writes the order to Supabase, sends confirmation emails), `health` (checks required env vars are present).
+- `lib/` — shared helpers: `stripe.ts` and `resend.ts` (API clients), `email-template.ts` (the branded HTML email wrapper), `pricing.ts` (bag-bundle and paper-sign pricing logic), `supabase/` (Supabase client setup for server vs. browser), `usps-csv.ts`, `guest-cart.ts`, `utils.ts`.
+- `supabase/schema.sql` and `supabase/migrations/` — the full database schema and its migration history. `supabase/seed.sql` has sample seed data.
+
+### Environment variables (set in Vercel → Project → Settings → Environment Variables, mirrored locally in `.env.local`)
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_ACCOUNT_ID`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `CONTACT_EMAIL`, `NEXT_PUBLIC_SITE_URL`, plus USPS sender address fields used for shipping labels/CSV export.
+
+### Local development
+1. Clone the repo, `npm install`
+2. Copy `.env.example` to `.env.local` and fill in test-mode Supabase/Stripe/Resend values
+3. `npm run dev`
+4. To test the full purchase → webhook → email flow locally, use the Stripe CLI: `stripe login`, then `stripe listen --forward-to localhost:3000/api/stripe/webhook`, and check out with Stripe's test card `4242 4242 4242 4242`
+
+### Things to know before touching this codebase
+- **Only signs, pricing tiers, tags, and orders are admin-editable.** Everything else on the homepage (hero copy, section order, the "How to Make a Sign" video) is hardcoded in `app/page.tsx` — don't assume there's a CMS field backing it.
+- **Resend domain verification status should be checked before assuming production email works.** As of this handoff, verify current status in the Resend dashboard — if it shows "Failed"/"Pending," production emails from an `@protestsigns.com` address will be unreliable/land in spam until the DNS records (in GoDaddy) are added and propagate.
+- **Stripe test vs. live keys** — see Section 8. Never mix a test key with a live key.
+- **The Stripe webhook is the source of truth for orders** — orders are created in `checkout.session.completed`, not at Checkout Session creation time. If testing locally, the webhook must be reachable (via `stripe listen`) or orders won't be created even if the Stripe payment succeeds.
+- **Admin role** — user roles (owner/admin/customer) are managed in Supabase's `users` table via `/admin/users`; the "Owner" role can't be modified on yourself from the UI (by design).
+- **Mobile responsiveness** — the site uses Tailwind's mobile-first responsive classes throughout; no fixed pixel widths were found in a review pass, but there's no automated visual regression testing, so changes should be manually checked on a narrow viewport.
+
+---
+
+## ⚠️ Known Outstanding Item: Resend Domain Verification
+
+As of this handoff, **protestsigns.com is not yet verified in Resend.** This is the single most important loose end to close before/soon after handoff, because it's the most likely explanation for past "customers never got their email" complaints.
+
+**What needs to happen:** DNS records (a DKIM TXT record, an SPF TXT record, and an SPF/MX record) need to be added at **GoDaddy**, where the domain is registered. Resend generates these exact records for you — log into Resend → Domains → protestsigns.com to see them, or ask a developer to pull and add them. Once added, DNS propagation typically takes anywhere from a few minutes to a few hours.
+
+**Will it automatically start sending from the protestsigns.com domain and stay out of spam once verified?** Two separate things need to both be true:
+1. **The domain needs to show "Verified" in Resend** (the DNS step above).
+2. **`RESEND_FROM_EMAIL` needs to be set to an `@protestsigns.com` address in Vercel's environment variables.** If that variable isn't set, or is missing, the code falls back to Resend's own shared sandbox address (`onboarding@resend.dev`) — which works, but never looks like it's really coming from Protest Signs.
+
+Once *both* of those are true, yes — emails will actually be sent from an `@protestsigns.com` address instead of the fallback. That alone fixes the most common cause of landing in spam (an unverified/mismatched sending domain is one of the biggest spam signals to Gmail/Outlook).
+
+**However, verification is not an absolute guarantee against spam.** Deliverability also depends on things like how many people mark the email as spam, how "spammy" the email content looks, and general sender reputation building up over time. Verifying the domain gets you from "almost certainly flagged" to "normal transactional email deliverability" — it's the single biggest fix available, but not a 100% guarantee forever.
+
+**In the meantime**, a small safeguard has been added directly to the site: both the checkout success page and the contact form's "message sent" confirmation now display a note asking customers to check their spam/junk folder if they don't see the email — so customers aren't left thinking the site is broken while this gets fixed.
