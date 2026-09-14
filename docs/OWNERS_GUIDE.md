@@ -47,6 +47,7 @@ In plain terms, here's what happens when someone buys something:
 ![Sign in page](sign-screenshots/signin.png)
 ![Browse page](sign-screenshots/browse.png)
 ![Product page](sign-screenshots/product.png)
+![About page](sign-screenshots/about.png)
 ![Cart](sign-screenshots/cart.png)
 ![Contact page](sign-screenshots/contact.png)
 ![Donate page](sign-screenshots/donate.png)
@@ -77,26 +78,7 @@ In plain terms, here's what happens when someone buys something:
 
 You don't need to memorize this, but it helps to have the mental picture when something goes wrong and you need to describe the problem to a developer.
 
-```mermaid
-flowchart LR
-    Customer[Customer's browser]
-    Site["protestsigns.com\n(runs on Vercel)"]
-    DB[(Supabase\ndatabase)]
-    Pay[Stripe\npayments]
-    Mail[Resend\nemail sending]
-    Admin[Admin Panel\n/admin]
-    You[You]
-
-    Customer -->|browses, buys| Site
-    Site -->|reads/writes signs, orders, accounts| DB
-    Site -->|charges card| Pay
-    Pay -->|"payment succeeded" notification| Site
-    Site -->|sends order/contact emails| Mail
-    Mail -->|delivers| Customer
-    Mail -->|delivers "new order" alert| You
-    You -->|manages store| Admin
-    Admin --> DB
-```
+![Architecture diagram](diagrams/architecture.png)
 
 **In words:** the website itself (code) lives on **GitHub** and runs on **Vercel**. All store data (signs, orders, accounts) lives in **Supabase**. Payments go through **Stripe**. Emails go through **Resend**. The **Admin Panel** is just a part of the website only staff can access, which reads and writes the same Supabase database.
 
