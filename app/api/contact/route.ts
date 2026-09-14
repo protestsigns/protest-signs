@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { resend } from '@/lib/resend'
+import { wrapEmail } from '@/lib/email-template'
 import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: Request) {
@@ -39,26 +40,49 @@ export async function POST(request: Request) {
       )
     }
 
-    // Send email notification
+    const fromAddress = `Protest Signs <${process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev'}>`
+    const safeMessage = message.replace(/\n/g, '<br>')
+
+    // Notify the site owner
     try {
       await resend.emails.send({
-        from: `Protest Signs <${process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev'}>`,
+        from: fromAddress,
         to: process.env.CONTACT_EMAIL || 'sustainamericallc@gmail.com',
         replyTo: email,
         subject: `New Contact Form: ${name}`,
-        html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>From:</strong> ${name} (${email})</p>
-          <p><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, '<br>')}</p>
-          <hr>
-          <p><small>Sent from protestsigns.com contact form</small></p>
-        `,
+        html: wrapEmail(
+          'New Contact Form Submission',
+          `
+            <h2 style="margin-top:0;">New Contact Form Submission</h2>
+            <p><strong>From:</strong> ${name} (${email})</p>
+            <p><strong>Message:</strong></p>
+            <p>${safeMessage}</p>
+          `
+        ),
       })
     } catch (emailError) {
       console.error('Email error:', emailError)
       // Don't fail the request if email fails
       // Message is still saved in database
+    }
+
+    // Confirm receipt with the person who submitted the form
+    try {
+      await resend.emails.send({
+        from: fromAddress,
+        to: email,
+        subject: `We received your message — Protest Signs`,
+        html: wrapEmail(
+          'Thanks for reaching out',
+          `
+            <h2 style="margin-top:0;">Thanks for reaching out, ${name}!</h2>
+            <p>We received your message and will get back to you soon.</p>
+            <p style="color:#555;"><strong>Your message:</strong><br>${safeMessage}</p>
+          `
+        ),
+      })
+    } catch (emailError) {
+      console.error('Confirmation email error:', emailError)
     }
 
     return NextResponse.json({ success: true })

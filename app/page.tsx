@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatPrice } from '@/lib/utils'
 import { getBagTiers, type PricingTier } from '@/lib/pricing'
-import { ArrowRight, Star, Shield, Truck, Megaphone, PlayCircle } from 'lucide-react'
+import { ArrowRight, Star, Shield, Truck, Megaphone } from 'lucide-react'
 import { SignCard } from '@/components/sign-card'
 
 export const dynamic = 'force-dynamic'
@@ -324,11 +324,19 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              {/* Video placeholder */}
-              <div className="bg-gray-900 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-8 min-h-[260px]">
-                <PlayCircle className="w-16 h-16 text-white opacity-60 mb-4" />
-                <p className="text-white text-xl font-bold mb-2 text-center">How to Make a Sign</p>
-                <p className="text-gray-400 text-sm text-center">Video coming soon — see how quick and easy it is to put together a bag sign from start to finish.</p>
+              {/* How to Make a Sign video */}
+              <div className="bg-gray-900 rounded-2xl overflow-hidden flex flex-col">
+                <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+                  <iframe
+                    className="absolute inset-0 w-full h-full"
+                    src="https://www.youtube.com/embed/xYfBKdR5Lgg"
+                    title="How to Make a Sign"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+                <p className="text-white text-lg font-bold px-6 pt-4 text-center">How to Make a Sign</p>
+                <p className="text-gray-400 text-sm px-6 pb-6 pt-1 text-center">See how quick and easy it is to put together a bag sign from start to finish.</p>
               </div>
             </div>
           </div>

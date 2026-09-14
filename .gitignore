@@ -49,3 +49,6 @@ buck-7-27/
 
 # local TODO files
 TODO*.md
+
+# Client handoff screenshots — contain real customer emails/order data, local-use only
+docs/sign-screenshots/
